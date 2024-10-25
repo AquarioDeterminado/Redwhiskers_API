@@ -1,7 +1,12 @@
 {
-  "name": "Whiskers_API",
+  "name": "WhiskersAPI",
   "version": "1.0.0",
   "dependencies": {
-    "sequelize": "^6.37.3"
+    "@sequelize/mysql": "^7.0.0-alpha.42",
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.7.1"
+  },
+  "scripts": {
+    "start": "node src/app.js"
   }
 }
