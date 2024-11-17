@@ -12,7 +12,7 @@ async function RegistarUser(body) {
             body.password = await mongo.encrypt(body.password); //TODO: Tirar brevemente
 
             if (salt != undefined) {
-                await mongo.InsertData("User", { userid: iduser, username: body.username, email: body.email, inventory: [], panda: [], scores: [], powerUpStats: [], questProgress: [] });
+                await mongo.InsertData("User", { userid: iduser, username: body.username, email: body.email });
                 await mongo.InsertData("Pass", { userid: iduser, pass: await mongo.ReturnHash(await mongo.decrypt(body.password), salt), salt: salt, creationDate: new Date(), used: true, tokens: [] });
                 return true;
             }

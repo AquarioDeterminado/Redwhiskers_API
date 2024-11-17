@@ -32,13 +32,14 @@ app.post('/register', async (req, res) => {
     var token = await FS.RegistarUser(req.body);
 
     if (token != "O nome de Utilizador já existe!") {
-        if (token)
-            res.status(200).header({ "Token": token }).send('Utilizador registado com sucesso');
+        if (token) {
+            res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
+        }
         else
-            res.status(401).send('Failed to register');
+            res.send('Failed to register');
     }
     else
-        res.status(401).send(token);
+        res.send(token);
 });
 
 app.post('/forgot-password', (req, res) => {
