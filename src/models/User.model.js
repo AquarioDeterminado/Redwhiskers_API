@@ -2,6 +2,7 @@ function makeModel() {
     const mongoose = require('mongoose');
     const Schema = mongoose.Schema;
     const UserSchema = new Schema({
+        userid: {type: Number, required: true},
         username: {type: String, required: true},
         email: {type: String, required: true},
         inventory: {type: Array, default: [], schema: {cosmeticId: Schema.Types.ObjectId}},
@@ -10,7 +11,7 @@ function makeModel() {
         powerUpStats: {type: Array, default: [], schema: {powerUpId: Schema.Types.ObjectId, powerUpLevel: Number}},
         questProgress: {type: Array, default: []}, schema: new Schema({questId: Schema.Types.ObjectId, progress: Number}),
     });
-    const User = mongoose.model('User', UserSchema);
+    const User = mongoose.models.User || mongoose.model('User', UserSchema);
     return User;
 }
 

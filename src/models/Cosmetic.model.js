@@ -2,6 +2,7 @@ function makeModel() {
 const mongoose = require('mongoose');
     const Schema = mongoose.Schema;
     const CosmeticSchema = new Schema({
+        cosmeticid: {type: Number, required: true},
         name: {type: String, required: true},
         description: {type: String, required: true},
         price: {type: Number, required: true},
@@ -9,7 +10,7 @@ const mongoose = require('mongoose');
         image: {type: String, required: true},
         category: {type: String, required: true},
     });
-    const Cosmetic = mongoose.model('Cosmetic', CosmeticSchema);
+    const Cosmetic = mongoose.models.Cosmetic ||  mongoose.model('Cosmetic', CosmeticSchema);
     return Cosmetic;
 }
 
