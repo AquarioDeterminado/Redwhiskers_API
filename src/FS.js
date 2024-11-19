@@ -6,15 +6,16 @@ async function login() {
 
 async function RegistarUser(body) {
     try {
-        if ((await mongo.CollectAExpecificData("User", { username: body.username })).length==0) {
+        if ((await mongo.CollectAExpecificData("User", { username: body.username })).length == 0) {
             const salt = await mongo.salt(); // Generate a random salt
             const iduser = await mongo.CollectId("User");
             body.password = await mongo.encrypt(body.password); //TODO: Tirar brevemente
 
             if (salt != undefined) {
                 await mongo.InsertData("User", { userid: iduser, username: body.username, email: body.email });
-                await mongo.InsertData("Pass", { userid: iduser, pass: await mongo.ReturnHash(await mongo.decrypt(body.password), salt), salt: salt, creationDate: new Date(), used: true, tokens: [] });
-                return true;
+                let token = await mongo.Createtoken();
+                await mongo.InsertData("Pass", { userid: iduser, pass: await mongo.ReturnHash(await mongo.decrypt(body.password), salt), salt: salt, creationDate: new Date(), used: true, tokens: [{ token: token, created: new Date(), active: true }]});
+                return token;
             }
         }
         else
@@ -27,7 +28,7 @@ async function RegistarUser(body) {
 
 async function ValidToken(token, userid) {
     try {
-        const pass = await mongo.CollectAExpecificData("Pass", { tokens: token, userid: userid });
+        const pass = await mongo.CollectAExpecificData("Pass", { tokens: token, userid: iduser, pass: password });
         if (pass != undefined)
             return true;
         else

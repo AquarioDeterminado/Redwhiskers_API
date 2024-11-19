@@ -37,6 +37,8 @@ function decrypt(encryptedData) {
 
 //#endregion
 
+//#region Simple Requests MongoDB 
+
 async function Run() {
     var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017/whiskers',
         {
@@ -90,7 +92,6 @@ async function switchModel(modelName) {
             break;
     }
 }
-
 async function CollectData(modelName) {
     var s = await switchModel(modelName);
 
@@ -133,6 +134,22 @@ async function DeleteUser(modelName) {
     s.deleteMany({}).exec();
 }
 
+//#endregion
+
+//#region Token
+
+async function Createtoken() {
+    var token = crypto.randomBytes(40).toString('hex');
+
+    if (await CollectAExpecificData("Pass", { tokens: token }).length > 0)
+        Createtoken();
+    else
+        return token;
+}
+
+//#endregion
+
+
 module.exports =
 {
     Run,
@@ -142,8 +159,9 @@ module.exports =
     InsertData,
     CollectId,
     ReturnHash,
-    encrypt, //temp
+    encrypt,
     salt,
     decrypt,
     DeleteUser,
+    Createtoken,
 }
