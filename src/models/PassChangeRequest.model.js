@@ -3,8 +3,8 @@ function makeModel() {
     const Schema = mongoose.Schema;
     const PassChangeRequestSchema = new Schema({
         passchangerequestid: {type: Number, required: true},
-        userId: {type: Schema.Types.ObjectId, required: true},
-        newPass: {type: Schema.Types.Mixed, required: true},
+        userId: {type: Number, required: true},
+        newPass: {type: String, required: true},
         creationDate: {type: Date, default: Date.now},
         verified: {type: Boolean, default: false},
     });

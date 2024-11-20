@@ -18,8 +18,8 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.post('/login', (req, res) => {
-    FS.login(req.body);
+app.post('/login', async (req, res) => {
+    await FS.login(req.body);
     res.send('Login');
 });
 

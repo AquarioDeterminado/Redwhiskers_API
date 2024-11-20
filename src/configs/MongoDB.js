@@ -64,29 +64,19 @@ async function switchModel(modelName) {
             return require('../models/User.model.js').makeModel();
             break;
         case "Cosmetic":
-            return mongoose.model(`Cosmetic`, {
-                cosmeticid: Number, name: String, description: String, price: Number, creationDate: Date, image: String, category: String
-            });
+            return require('../models/Cosmetic.model.js').makeModel();
             break;
         case "Pass":
-            return mongoose.model(`Pass`, {
-                passid: Number, userid: Number, pass: String, salt: String, creationDate: Date, used: Boolean, tokens: Array
-            });
+            return require('../models/Pass.model.js').makeModel();
             break;
         case "EmailChangeRequest":
-            return mongoose.model(`EmailChangeRequest`, {
-                EmailChangeRequestid: Number, userId: String, newEmail: String, creationDate: Date, verified: Boolean
-            });
+            return require('../models/EmailChangeRequest.model.js').makeModel();
             break;
         case "PassChangeRequest":
-            return mongoose.model(`PassChangeRequest`, {
-                passchangerequestid: Number, userId: String, newPass: String, creationDate: Date, verified: Boolean
-            });
+            return require('../models/PassChangeRequest.model.js').makeModel();
             break;
         case "PowerUp":
-            return mongoose.model(`PowerUp`, {
-                powerupid: Number, name: String, description: String, creationDate: Date
-            });
+            return require('../models/PowerUp.model.js').makeModel();
             break;
         default:
             break;
@@ -95,7 +85,7 @@ async function switchModel(modelName) {
 async function CollectData(modelName) {
     var s = await switchModel(modelName);
 
-    return (await s.find()).exec();
+    return (await s.find({})).exec();
 }
 
 async function CollectAExpecificData(modelName, datajson) {
@@ -111,6 +101,7 @@ async function InsertData(modelName, datajson) {
     // (await (new s(datajson))).save();
     var as = new s(datajson);
     (as).save();
+    return "Greenlight";
 }
 
 async function DeleteData(modelName, datajson) {
