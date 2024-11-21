@@ -85,7 +85,7 @@ async function switchModel(modelName) {
 async function CollectData(modelName) {
     var s = await switchModel(modelName);
 
-    return (await s.find({})).exec();
+    return (await s.find({}));
 }
 
 async function CollectAExpecificData(modelName, datajson) {

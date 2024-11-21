@@ -1,8 +1,38 @@
 const mongo = require('./configs/MongoDB.js');
 
 async function login(body) {
+    var json = "";
+    body.password = await mongo.encrypt(body.password);
+
+    if (body.email != undefined)
+        json = { email: body.email };
+    else if (body.username != undefined)
+        json = { username: body.username };
+    else
+        return false;
+
+    var Datauser = await mongo.CollectAExpecificData("User", json);
+    var pass = (await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid }));
+    if (body.email != undefined) {
+        var as = await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid, used: true });
+        var hash = await mongo.ReturnHash(mongo.decrypt(body.password), pass[0].salt);
+        console.log('Password Match:', as[0].pass === hash);
+        if (as.lenght != 0) {
+            //TODO: Retornar o token
+        }
+
+    }
+    else if (body.username != undefined) {
+        var as = await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid, used: true });
+        var hash = await mongo.ReturnHash(mongo.decrypt(body.password), pass[0].salt);
+        console.log('Password Match:', as[0].pass === hash);
+        if (as.lenght != 0) {
+            //TODO: Retornar o token
+            return "sou lindo!!"
+        }
+    }
     //certificar password e username sem token
-    
+
     return true;
 }
 

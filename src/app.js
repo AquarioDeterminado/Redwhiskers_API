@@ -19,8 +19,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    await FS.login(req.body);
-    res.send('Login');
+    res.send(await FS.login(req.body));
 });
 
 app.delete(`/deleteTest`, async (req, res) => {
