@@ -8,7 +8,7 @@ function makeModel() {
         salt: {type: String, required: true},
         creationDate: {type: Date, default: Date.now},
         used: {type: Boolean, default: false},
-        tokens: {type: Array, default: []},
+        tokens: {type: Array, default: [], schema: {token: String, created: Date, active: Boolean}},
     });
     const Pass = mongoose.models.Pass || mongoose.model('Pass', PassSchema);
     return Pass;

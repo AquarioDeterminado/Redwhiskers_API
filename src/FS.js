@@ -9,31 +9,27 @@ async function login(body) {
     else if (body.username != undefined)
         json = { username: body.username };
     else
-        return false;
+        return "Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente";
 
     var Datauser = await mongo.CollectAExpecificData("User", json);
-    var pass = (await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid }));
-    if (body.email != undefined) {
-        var as = await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid, used: true });
-        var hash = await mongo.ReturnHash(mongo.decrypt(body.password), pass[0].salt);
-        console.log('Password Match:', as[0].pass === hash);
-        if (as.lenght != 0) {
-            //TODO: Retornar o token
-        }
+    if (Datauser.length != 0) {
 
-    }
-    else if (body.username != undefined) {
+        var pass = (await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid }));
+
         var as = await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid, used: true });
         var hash = await mongo.ReturnHash(mongo.decrypt(body.password), pass[0].salt);
-        console.log('Password Match:', as[0].pass === hash);
-        if (as.lenght != 0) {
+        // console.log('Password Match:', as[0].pass === hash);
+        if (as[0].pass === hash) {
+            return "{\"Mensagem\":\"Login com sucesso!\", \"token\":\"" + as[0].tokens[0].token + "\" }";
             //TODO: Retornar o token
-            return "sou lindo!!"
         }
+        else
+            return `{\"Mensagem\":\"Certifique que meteu o ${body.email != undefined ? "email" : "username"} e/ou Password corretamente! Por favor verifique se colocou tudo corretamente!\"}`;
     }
+    else
+        return "{\"Mensagem\":\"O utilizador não existe! Por favor, registe o mesmo, antes de tentar fazer login!\"}";
     //certificar password e username sem token
 
-    return true;
 }
 
 async function RegistarUser(body) {
@@ -65,14 +61,19 @@ async function RegistarUser(body) {
 
 async function ValidToken(token, userid) {
     try {
-        const pass = await mongo.CollectAExpecificData("Pass", { tokens: token });
-        if (pass != undefined)
-            return true;
+        const pass = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: token } } });
+        if (pass.length > 0) {
+            if(Math.floor((new Date() - pass[0].tokens[0].created) / (1000 * 60 * 60 * 24)) > 60){
+                return "{\"Mensagem\":\"Token expirado! Fazer login novamnete\", \"QueFazer\":\"Desconnect_User\"}";
+            }
+            else
+                return "{\"Mensagem\":\"Token válido!\", \"QueFazer\":\"Continuar\"}";
+        }
         else
-            return false;
+            return "{\"Mensagem\":\"Token inválido ou não existente! Por favor, fazer login!\", \"QueFazer\":\"Desconnect_User\"}";
     } catch (err) {
         console.log(err);
-        return false;
+        return "{\"Mensagem\":\"Algum erro aconteceu. Reportar aos administradores!\", \"QueFazer\":\"Desconnect_User\"}";
     }
 }
 
