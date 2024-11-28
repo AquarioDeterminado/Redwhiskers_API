@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
+//Finish!
 app.post('/login', async (req, res) => {
     var result = await FS.login(req.body);
     if (result.includes("Login com sucesso!")) {
@@ -32,7 +33,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-
+//Finish!
 app.post('/register', async (req, res) => {
     var token = await FS.RegistarUser(req.body);
 
@@ -52,6 +53,7 @@ app.post('/register', async (req, res) => {
         res.send(token);
 });
 
+//Finish!
 app.post('/check-token', async (req, res) => {
     var result = await FS.ValidToken(req.headers.token, 0); //TODO: É necessário mudar receber o numero de utilizador para fazer o request?
 
@@ -60,7 +62,7 @@ app.post('/check-token', async (req, res) => {
         res.end(result);
         // res.send('{\"essage\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
     }
-    else if(result.includes("Algum erro aconteceu. Reportar aos administradores")) {
+    else if (result.includes("Algum erro aconteceu. Reportar aos administradores")) {
         res.writeHead(409, { 'Content-Type': 'application/json' });
         res.end(result);
     }
@@ -70,6 +72,19 @@ app.post('/check-token', async (req, res) => {
         // res.send('Failed to register');
     }
 
+});
+
+app.post('/change-password', async (req, res) => {
+    var result = await FS.ChangePassword(req.body);
+
+    if (JSON.parse(result).Mensagem.includes("Password alterada com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.parse(result).Mensagem);
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.parse(result).Mensagem);
+    }
 });
 
 app.post('/forgot-password', (req, res) => {

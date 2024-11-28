@@ -77,6 +77,16 @@ async function ValidToken(token, userid) {
     }
 }
 
+async function ChangePassword(token, userId, newpassword){
+    try{
+
+        //TODO: Work here Joao
+
+    }catch(ex){
+
+    }
+}
+
 //TODO: Apagar depois dos testes!
 async function DeleteUser(body) {
     try {
@@ -93,5 +103,6 @@ module.exports = {
     login,
     RegistarUser,
     ValidToken,
-    DeleteUser
+    ChangePassword,
+    DeleteUser,
 }

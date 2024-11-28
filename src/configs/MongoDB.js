@@ -99,9 +99,14 @@ async function InsertData(modelName, datajson) {
     var s = await switchModel(modelName);
 
     // (await (new s(datajson))).save();
-    var as = new s(datajson);
-    (as).save();
-    return "Greenlight";
+
+    if ((JSON.stringify(datajson)).replace(/ /g, '').replace(/[<>\/'"]+/g, '').includes("{$ne:" || "{$where:")) {
+        var as = new s(datajson);
+        (as).save();
+        return "Greenlight";
+    }
+    else
+        return "Redlight";
 }
 
 async function DeleteData(modelName, datajson) {
