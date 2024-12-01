@@ -1,0 +1,14 @@
+function makeModel() {
+    const mongoose = require('mongoose');
+    const Schema = mongoose.Schema;
+    const EmailChangeRequestSchema = new Schema({
+        userId: {type: String, required: true},
+        newEmail: {type: String, required: true},
+        creationDate: {type: Date, default: Date.now},
+        verified: {type: Boolean, default: false},
+    });
+    const EmailChangeRequest = mongoose.model('EmailChangeRequest', EmailChangeRequestSchema);
+    return EmailChangeRequest;
+}
+
+module.exports = {makeModel}
