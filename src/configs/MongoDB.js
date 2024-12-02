@@ -78,6 +78,9 @@ async function switchModel(modelName) {
         case "PowerUp":
             return require('../models/PowerUp.model.js').makeModel();
             break;
+        case "GameLobby":
+            return require('../models/GameLobby.model.js').makeModel();
+            break;
         default:
             break;
     }
@@ -100,7 +103,7 @@ async function InsertData(modelName, datajson) {
 
     // (await (new s(datajson))).save();
 
-    if ((JSON.stringify(datajson)).replace(/ /g, '').replace(/[<>\/'"]+/g, '').includes("{$ne:" || "{$where:")) {
+    if (!((JSON.stringify(datajson)).replace(/ /g, '').replace(/[<>\/'"]+/g, '')).includes("{$ne:" || "{$where:")) {
         var as = new s(datajson);
         (as).save();
         return "Greenlight";

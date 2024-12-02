@@ -1,7 +1,7 @@
 const { Run } = require("./configs/MongoDB.js");
 require('dotenv').config();
 const exp = require('express');
-const app = (exp)();
+const app = exp();
 const FS = require('./FS.js');
 app.use(exp.json())
 
@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 //Finish!
 app.post('/login', async (req, res) => {
-    var result = await FS.login(req.body);
+    var result =  await FS.login(req.body);
     if (result.includes("Login com sucesso!")) {
         res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': JSON.parse(result).token });
         res.end(JSON.parse(result).Mensagem.toString());
@@ -37,7 +37,7 @@ app.post('/login', async (req, res) => {
 app.post('/register', async (req, res) => {
     var token = await FS.RegistarUser(req.body);
 
-    if (token != "O nome de Utilizador já existe!") {
+    if (token != "O nome de Utilizador já existe!\n O username ou email já existe!") {
         if (token) {
             res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token });
             res.end("Utilizador registado com sucesso!");
@@ -95,9 +95,28 @@ app.post('/reset-password', (req, res) => {
     res.send('Reset Password');
 });
 
+app.post(`/registLobby`, async (req, res) => {
+    var result = await FS.RegistarLobby(req.body);
+
+    if (result) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(result);
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(result);
+    }
+});
+
 app.delete(`/deleteTest`, async (req, res) => {
     await FS.DeleteUser(req.body);
     res.send('Deleted');
+});
+
+app.get(`/collectLastId`, async (req, res) => {
+    var s = await FS.CollectLastId();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(s.toString());
 });
 
 //TODO: https://stackoverflow.com/questions/11744975/enabling-https-on-express-js

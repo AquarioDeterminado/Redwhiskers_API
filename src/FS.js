@@ -2,14 +2,14 @@ const mongo = require('./configs/MongoDB.js');
 
 async function login(body) {
     var json = "";
-    body.password = await mongo.encrypt(body.password);
+    // body.password = await mongo.encrypt(body.password);
 
     if (body.email != undefined)
-        json = { email: body.email };
+        json = { email: body.email.toLowerCase() };
     else if (body.username != undefined)
-        json = { username: body.username };
+        json = { username: body.username.toLowerCase() };
     else
-        return "Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente";
+        return "{\"Mensagem\":\"Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente\"}";
 
     var Datauser = await mongo.CollectAExpecificData("User", json);
     if (Datauser.length != 0) {
@@ -20,7 +20,7 @@ async function login(body) {
         var hash = await mongo.ReturnHash(mongo.decrypt(body.password), pass[0].salt);
         // console.log('Password Match:', as[0].pass === hash);
         if (as[0].pass === hash) {
-            return "{\"Mensagem\":\"Login com sucesso!\", \"token\":\"" + as[0].tokens[0].token + "\" }";
+            return `{\"Mensagem\":\"Login com sucesso!\", \"token\":\" ${as[0].tokens[0].token} \"}`;
             //TODO: Retornar o token
         }
         else
@@ -34,13 +34,13 @@ async function login(body) {
 
 async function RegistarUser(body) {
     try {
-        if ((await mongo.CollectAExpecificData("User", { username: body.username })).length == 0) {
+        if ((await mongo.CollectAExpecificData("User", { username: body.email.toLowerCase() })).length == 0 && (await mongo.CollectAExpecificData("User", { username: body.username.toLowerCase() })).length == 0) {
             const salt = await mongo.salt(); // Generate a random salt
             const iduser = await mongo.CollectId("User");
             body.password = await mongo.encrypt(body.password); //TODO: Tirar brevemente
 
             if (salt != undefined) {
-                var return1 = await mongo.InsertData("User", { userid: iduser, username: body.username, email: body.email });
+                var return1 = await mongo.InsertData("User", { userid: iduser, username: body.username.toLowerCase(), email: body.email.toLowerCase() });
                 let token = await mongo.Createtoken();
                 var lenghtpass = await mongo.CollectId("Pass");
                 var return2 = await mongo.InsertData("Pass", { passid: lenghtpass, userid: iduser, pass: await mongo.ReturnHash(await mongo.decrypt(body.password), salt), salt: salt, creationDate: new Date(), used: true, tokens: [{ token: token, created: new Date(), active: true }] });
@@ -52,7 +52,7 @@ async function RegistarUser(body) {
             }
         }
         else
-            return "O nome de Utilizador já existe!";
+            return "O nome de Utilizador já existe!\n O username ou email já existe!";
     } catch (err) {
         console.log(err);
         return false;
@@ -63,11 +63,12 @@ async function ValidToken(token, userid) {
     try {
         const pass = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: token } } });
         if (pass.length > 0) {
-            if(Math.floor((new Date() - pass[0].tokens[0].created) / (1000 * 60 * 60 * 24)) > 60){
+            if (Math.floor((new Date() - pass[0].tokens[0].created) / (1000 * 60 * 60 * 24)) > 60) {
                 return "{\"Mensagem\":\"Token expirado! Fazer login novamnete\", \"QueFazer\":\"Desconnect_User\"}";
             }
-            else
-                return "{\"Mensagem\":\"Token válido!\", \"QueFazer\":\"Continuar\"}";
+            else {
+                return "{\"Mensagem\":\"Token válido!\", \"QueFazer\":\"Continuar\", \"UserId\":" + pass[0].userid + "}";
+            }
         }
         else
             return "{\"Mensagem\":\"Token inválido ou não existente! Por favor, fazer login!\", \"QueFazer\":\"Desconnect_User\"}";
@@ -77,13 +78,23 @@ async function ValidToken(token, userid) {
     }
 }
 
-async function ChangePassword(token, userId, newpassword){
-    try{
+async function ChangePassword(token, userId, newpassword) {
+    try {
 
         //TODO: Work here Joao
 
-    }catch(ex){
+    } catch (ex) {
 
+    }
+}
+
+async function CollectLastId() {
+    try {
+        var id = (await mongo.CollectData("User"));
+        return id.length;
+    } catch (err) {
+        console.log(err);
+        return false;
     }
 }
 
@@ -99,10 +110,17 @@ async function DeleteUser(body) {
     }
 }
 
+async function RegistarLobby(body){
+    
+}
+
 module.exports = {
     login,
     RegistarUser,
     ValidToken,
     ChangePassword,
+    CollectLastId,
+    RegistarLobby,
+    //TEST Delete after de last test
     DeleteUser,
 }
