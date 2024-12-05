@@ -1,0 +1,1 @@
+docker exec -it docker-files-DB-1 -u root -p gizmov-cavdob-nanQo7

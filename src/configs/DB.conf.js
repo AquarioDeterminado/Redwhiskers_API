@@ -1,4 +1,5 @@
 const {mongoose} = require('mongoose');
+require('dotenv').config({ path: '../.env' });
 const {makeModels} = require("../models/utils/Models.util");
 
 let Models = {};
