@@ -124,8 +124,10 @@ async function CollectId(modelName) {
 
     if (s.length == 0)
         return 1;
-    else
+    else if(modelName == "User")
         return s[s.length - 1].userid + 1;
+    else if(modelName == "GameLobby")
+        return s[s.length - 1].GameLobbyid + 1;
 }
 
 async function DeleteUser(modelName) {
@@ -148,6 +150,10 @@ async function Createtoken() {
 
 //#endregion
 
+//#region Create CodeIdLobby
+async function CodeIdLobby(){
+    return crypto.randomBytes(12).toString('hex');
+}
 
 module.exports =
 {
@@ -163,4 +169,5 @@ module.exports =
     decrypt,
     DeleteUser,
     Createtoken,
+    CodeIdLobby,
 }

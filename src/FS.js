@@ -61,7 +61,13 @@ async function RegistarUser(body) {
 
 async function ValidToken(token, userid) {
     try {
-        const pass = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: token } } });
+        let pass;
+        if (userid != 0) {
+            pass = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: token } }, userid: userid });
+        }
+        else
+            pass = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: token } } });
+
         if (pass.length > 0) {
             if (Math.floor((new Date() - pass[0].tokens[0].created) / (1000 * 60 * 60 * 24)) > 60) {
                 return "{\"Mensagem\":\"Token expirado! Fazer login novamnete\", \"QueFazer\":\"Desconnect_User\"}";
@@ -110,9 +116,53 @@ async function DeleteUser(body) {
     }
 }
 
-async function RegistarLobby(body){
-    
+async function RegistarLobby(body) {
+    try {
+
+        if (await mongo.CollectAExpecificData("User", { userid: body.idHoster }).length != 0) {
+
+            if ((await ValidToken(body.token, body.idHoster)).includes("{\"Mensagem\":\"Token válido!\",")) {
+
+                var id = await mongo.CollectId("GameLobby");
+
+                var codeLobby = "", json = "";
+
+                if (body.typeLobby != "Singleplayer") {
+
+                    while (true) {
+                        codeLobby = await mongo.CodeIdLobby();
+
+                        if ((await mongo.CollectAExpecificData("GameLobby", { CodeId: codeLobby, Game })).length == 0)
+                            break;
+                    }
+
+                    json = { GameLobbyid: id, ListUserIdLobby: [body.userid], CodeId: codeLobby, GameWasStarted: false, LobbyCreated: body.LobbyCreated, LobbyActive: true, TypeOfLobby: 0 };
+
+                }
+                else
+                    json = { GameLobbyid: id, ListUserIdLobby: [body.userid], CodeId: "", GameWasStarted: false, LobbyCreated: body.LobbyCreated, LobbyActive: true, TypeOfLobby: 4 };
+
+                await mongo.InsertData("GameLobby", json);
+                
+                if (body.typeLobby != "Singleplayer")
+                    return { "Mensagem": "Lobby criado com sucesso!", "GameLobbyid": id };
+                else
+                    return { "Mensagem": "Lobby criado com sucesso!", "CodeId": codeLobby, "GameLobbyid": id };
+
+            }
+            else
+                return { "Mensagem": "O token não é válido! Por favor, faça login novamente!" };
+        }
+        else
+            return { "Mensagem": "O utilizador não existe! Por favor, registe o mesmo, antes de tentar criar" };
+
+    }
+    catch (ex) {
+        console.log(ex);
+        return { "Mensagem": "Erro ao criar o lobby!" };
+    }
 }
+//TODO: Criar uma função para modificar o idLobby, TypeOfLobby
 
 module.exports = {
     login,

@@ -95,16 +95,17 @@ app.post('/reset-password', (req, res) => {
     res.send('Reset Password');
 });
 
+//Finish!
 app.post(`/registLobby`, async (req, res) => {
     var result = await FS.RegistarLobby(req.body);
 
-    if (result) {
+    if (result.Mensagem.includes("Lobby criado com sucesso!")) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(result);
+        res.end(JSON.stringify(result));
     }
     else {
         res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(result);
+        res.end(JSON.stringify(result));
     }
 });
 
