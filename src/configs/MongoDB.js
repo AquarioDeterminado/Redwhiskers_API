@@ -40,7 +40,11 @@ function decrypt(encryptedData) {
 //#region Simple Requests MongoDB 
 
 async function Run() {
+    //https://mongoosejs.com/docs/connections.html#replicaset_connections
+    //https://mongoosejs.com/docs/connections.html#multiple_connections
+    // var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017/whiskers',
     var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017/whiskers',
+
         {
             authSource: "admin",
         }
@@ -52,6 +56,7 @@ async function Run() {
             console.error(err);
         }
     );
+    //,127.0.0.1:21018/whiskers
     console.log("Connected to MongoDB");
 }
 
@@ -124,9 +129,9 @@ async function CollectId(modelName) {
 
     if (s.length == 0)
         return 1;
-    else if(modelName == "User")
+    else if (modelName == "User")
         return s[s.length - 1].userid + 1;
-    else if(modelName == "GameLobby")
+    else if (modelName == "GameLobby")
         return s[s.length - 1].GameLobbyid + 1;
 }
 
@@ -151,7 +156,7 @@ async function Createtoken() {
 //#endregion
 
 //#region Create CodeIdLobby
-async function CodeIdLobby(){
+async function CodeIdLobby() {
     return crypto.randomBytes(12).toString('hex');
 }
 

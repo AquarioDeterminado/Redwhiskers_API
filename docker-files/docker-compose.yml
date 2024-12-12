@@ -2,7 +2,7 @@
 version: '3.1'
 services:
 
-  DB:
+  DB1:
     image: mongo:latest
     restart: always
     ports:
@@ -16,5 +16,20 @@ services:
     volumes:
       - dbdata6:/data/db
 
+  DB2:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "21018:27018"
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USR}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PWD}
+      MONGO_INITDB_DATABASE: whiskers
+    volumes:
+      - dbdata7:/data/db
+
 volumes:
   dbdata6:
+  dbdata7:
