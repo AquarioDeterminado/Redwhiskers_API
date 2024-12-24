@@ -42,8 +42,11 @@ function decrypt(encryptedData) {
 async function Run() {
     //https://mongoosejs.com/docs/connections.html#replicaset_connections
     //https://mongoosejs.com/docs/connections.html#multiple_connections
-    // var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017/whiskers',
-    var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017/whiskers',
+    var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:27017/whiskers',
+
+    //mongoose.connect('mongodb://user:pw@host1.com:27017,host2.com:27017,host3.com:27017/testdb');
+
+    //var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017,127.0.0.1:21018/whiskers?replicaSet=rs0',
 
         {
             authSource: "admin",

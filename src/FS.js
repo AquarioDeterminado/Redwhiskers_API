@@ -5,7 +5,7 @@ async function login(body) {
     // body.password = await mongo.encrypt(body.password);
 
     if (body.email != undefined)
-        json = { email: body.email.toLowerCase() };
+        json = { email: ''+body.email.toLowerCase() }; //FIXME: Verificar porque é que não funciona com o email!
     else if (body.username != undefined)
         json = { username: body.username.toLowerCase() };
     else
