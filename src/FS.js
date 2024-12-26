@@ -144,7 +144,7 @@ async function RegistarLobby(body) {
 
                 await mongo.InsertData("GameLobby", json);
                 
-                if (body.typeLobby != "Singleplayer")
+                if (body.typeLobby == "Singleplayer")
                     return { "Mensagem": "Lobby criado com sucesso!", "GameLobbyid": id };
                 else
                     return { "Mensagem": "Lobby criado com sucesso!", "CodeId": codeLobby, "GameLobbyid": id };

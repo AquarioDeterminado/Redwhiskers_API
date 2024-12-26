@@ -4,6 +4,7 @@ PowerUp = require('../../models/PowerUp.model.js');
 Cosmetic = require('../../models/Cosmetic.model.js');
 EmailChangeRequest = require('../../models/EmailChangeRequest.model.js');
 PassChangeRequest = require('../../models/PassChangeRequest.model.js');
+GameLobby = require('../../models/GameLobby.model.js');
 
 async function makeModels() {
     return {
@@ -12,7 +13,8 @@ async function makeModels() {
         Cosmetic: Cosmetic.makeModel(),
         EmailChangeRequest: EmailChangeRequest.makeModel(),
         PassChangeRequest: PassChangeRequest.makeModel(),
-        User: User.makeModel()
+        User: User.makeModel(),
+        GameLobby: GameLobby.makeModel(),
     };
 }
 

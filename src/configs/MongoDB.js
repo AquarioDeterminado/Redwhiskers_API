@@ -86,8 +86,8 @@ async function switchModel(modelName) {
         case "PowerUp":
             return require('../models/PowerUp.model.js').makeModel();
             break;
-        case "GameLobby":
-            return require('../models/GameLobby.model.js').makeModel();
+        case "GameLobby"://GameLobby.models.js
+            return require('../models/GameLobby.models.js').makeModel();
             break;
         default:
             break;
