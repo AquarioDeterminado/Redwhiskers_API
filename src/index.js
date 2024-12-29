@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 //Finish!
 app.post('/login', async (req, res) => {
-    var result =  await FS.login(req.body);
+    var result = await FS.login(req.body);
     if (result.includes("Login com sucesso!")) {
         res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': JSON.parse(result).token });
         res.end(JSON.parse(result).Mensagem.toString());
@@ -53,9 +53,22 @@ app.post('/register', async (req, res) => {
         res.send(token);
 });
 
+app.delete('/deleteUser', async (req, res) => {
+    var result = await FS.DeleteUser(req.body);
+
+    if (result.includes("Utilizador eliminado com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(result);
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(result);
+    }
+});
+
 //Finish!
 app.post('/check-token', async (req, res) => {
-    var result = await FS.ValidToken(req.headers.token, 0); //TODO: É necessário mudar receber o numero de utilizador para fazer o request?
+    var result = await FS.ValidToken(req.headers.token, 0);
 
     if (result.includes("Token válido")) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -109,9 +122,70 @@ app.post(`/registLobby`, async (req, res) => {
     }
 });
 
+//Finish!
+app.post(`/joinLobby`, async (req, res) => {
+    var result = await FS.JoinLobby(req.body);
+
+    if (result.Mensagem.includes("Entrou no lobby com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+});
+
+//Finish!
+app.put(`/leaveLobby`, async (req, res) => {
+    var result = await FS.LeaveLobby(req.body);
+
+    if (result.Mensagem.includes(" com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+});
+
+//Finish!
+app.get('/listLobby', async (req, res) => {
+    var result = await FS.ListLobby(req.body);
+
+    if (result.length > 0) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else if (result.Mensagem.includes('Não existe lobbys ativos!')) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+});
+
+//TODO: Falta update lobby
+
 app.delete(`/deleteTest`, async (req, res) => {
-    await FS.DeleteUser(req.body);
+    await FS.DeleteTable(req.body);
     res.send('Deleted');
+});
+
+app.put(`/deleteLobby`, async (req, res) => {
+    var result = await FS.DeleteLobby(req.body);
+
+    if (result.Mensagem.includes(" com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
 });
 
 app.get(`/collectLastId`, async (req, res) => {

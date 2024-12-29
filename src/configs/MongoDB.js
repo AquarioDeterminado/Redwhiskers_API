@@ -87,7 +87,7 @@ async function switchModel(modelName) {
             return require('../models/PowerUp.model.js').makeModel();
             break;
         case "GameLobby"://GameLobby.models.js
-            return require('../models/GameLobby.models.js').makeModel();
+            return require('../models/GameLobby.model.js').makeModel();
             break;
         default:
             break;
@@ -123,8 +123,23 @@ async function InsertData(modelName, datajson) {
 async function DeleteData(modelName, datajson) {
     var s = await switchModel(modelName);
 
-    return (await s.delete(datajson)).exec();
+    var as = await s.find(datajson).exec();
+    as = await s.deleteOne(datajson);
+
+    return as;
 }
+
+async function UpdateData(modelName, datajson, datajson2) {
+    var s = await switchModel(modelName);
+
+    //TODO: VERIFICAR PORQUE É QUE ELE NÃO ESTÁ A ATUALIZAR! 
+    var asasa = await s.find(datajson).exec();
+
+    var as = await s.updateOne(datajson, datajson2);
+
+    return as;
+}
+
 
 async function CollectId(modelName) {
     var s = await switchModel(modelName);
@@ -136,9 +151,11 @@ async function CollectId(modelName) {
         return s[s.length - 1].userid + 1;
     else if (modelName == "GameLobby")
         return s[s.length - 1].GameLobbyid + 1;
-}
+    else if(modelName == "Pass")
+        return s[s.length - 1].passid + 1;
+    }
 
-async function DeleteUser(modelName) {
+async function DeleteTable(modelName) {
     var s = await switchModel(modelName);
     s.deleteMany({}).exec();
 }
@@ -168,6 +185,7 @@ module.exports =
     Run,
     CollectData,
     DeleteData,
+    UpdateData,
     CollectAExpecificData,
     InsertData,
     CollectId,
@@ -175,7 +193,7 @@ module.exports =
     encrypt,
     salt,
     decrypt,
-    DeleteUser,
+    DeleteTable,
     Createtoken,
     CodeIdLobby,
 }
