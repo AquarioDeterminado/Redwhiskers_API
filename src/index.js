@@ -3,8 +3,9 @@ require('dotenv').config();
 const exp = require('express');
 const app = exp();
 const FS = require('./FS.js');
-app.use(exp.json())
+app.use(exp.json());
 
+//FIX: não lê o env!
 
 Run().then(() => {
     console.log('DB started');
@@ -51,6 +52,19 @@ app.post('/register', async (req, res) => {
     }
     else
         res.send(token);
+});
+
+app.post('/registerbot', async (req, res) => {
+    var result = await FS.RegistarBot(req.body);
+
+    if (!result.includes("Erro ao registar o bot!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(result);
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(result);
+    }
 });
 
 app.delete('/deleteUser', async (req, res) => {
@@ -192,6 +206,10 @@ app.get(`/collectLastId`, async (req, res) => {
     var s = await FS.CollectLastId();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(s.toString());
+});
+
+app.get('/test', async (req, res) => {
+    res.send('Test '+new Date().toLocaleString());
 });
 
 //TODO: https://stackoverflow.com/questions/11744975/enabling-https-on-express-js

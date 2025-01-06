@@ -1,0 +1,105 @@
+name: mongodb-replica-set
+
+services:
+  mongodb-1:
+    image: mongo:latest
+    command:
+      [
+        "mongod",
+        "--port",
+        "27017",
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/configdb/keyfile",
+      ]
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - dbdata1:/data/db
+    
+
+  mongodb-2:
+    image: mongo:latest
+    command:
+      [
+        "mongod",
+        "--port",
+        "27018",
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/configdb/keyfile",
+      ]
+    ports:
+      - "27018:27018"      
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USR}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PWD}
+      MONGO_INITDB_DATABASE: whiskers
+    volumes:
+      - dbdata2:/data/db
+
+  mongodb-3:
+    image: mongo:latest
+    command:
+      [
+        "mongod",
+        "--port",
+        "27019",
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/configdb/keyfile",
+      ]
+    ports:
+      - "27019:27019"      
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USR}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PWD}
+      MONGO_INITDB_DATABASE: whiskers
+    volumes:
+      - dbdata3:/data/
+
+  mongodb-init:
+    image: mongo:latest
+    depends_on:
+      - mongodb-1
+      - mongodb-2
+      - mongodb-3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: bash -c "chmod +x init-replica-set.sh && ./init-replica-set.sh"
+    volumes:
+      - "./init-replica-set.sh:/init-replica-set.sh"
+    restart: no
+
+networks:
+  default:
+    name: mongodb-replica-set-network
+
+volumes:
+  dbdata1:
+  dbdata2:
+  dbdata3:

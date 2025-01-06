@@ -89,6 +89,9 @@ async function switchModel(modelName) {
         case "GameLobby"://GameLobby.models.js
             return require('../models/GameLobby.model.js').makeModel();
             break;
+        case "Bot":
+            return require('../models/Bot.model.js').makeModel();
+            break;
         default:
             break;
     }
@@ -153,6 +156,8 @@ async function CollectId(modelName) {
         return s[s.length - 1].GameLobbyid + 1;
     else if(modelName == "Pass")
         return s[s.length - 1].passid + 1;
+    else if(modelName == "Bot")
+        return s[s.length - 1].Botid + 1;
     }
 
 async function DeleteTable(modelName) {

@@ -59,6 +59,22 @@ async function RegistarUser(body) {
     }
 }
 
+async function RegistarBot(body){
+    try{
+        let idbot = await mongo.CollectId("Bot");
+        let token = await mongo.Createtoken();
+
+        let result = await mongo.InsertData("Bot", { Botid: idbot, Botname: body.Botname, type: body.type, token: token, DateTime: new Date() });
+        if(result == "Greenlight")
+            return { botid: idbot, botname: body.Botname, token: token};
+        else
+            return {"Mensagem":"Erro ao registar o bot!"};
+    }
+    catch{
+
+    }
+}
+
 //TODO: Verificar se os campos estão corretos
 async function UpdateUser(body) {
     let json = "{";
@@ -359,6 +375,7 @@ async function DeleteLobby(body) {
 module.exports = {
     login,
     RegistarUser,
+    RegistarBot,
     UpdateUser,
     DeleteUser,
     ValidToken,
