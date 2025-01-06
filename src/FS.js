@@ -160,8 +160,8 @@ async function CollectLastId() {
 //TODO: Apagar depois dos testes!
 async function DeleteTable(body) {
     try {
-        await mongo.DeleteTable("User");
-        await mongo.DeleteTable("Pass");
+        // await mongo.DeleteTable("User");
+        // await mongo.DeleteTable("Pass");
         await mongo.DeleteTable("GameLobby");
         console.log('Deleted');
     } catch (err) {
@@ -325,7 +325,7 @@ async function DeleteLobby(body) {
         if (player.length != 0) {
 
             if ((await ValidToken(body.token, body.idHoster)).includes("{\"Mensagem\":\"Token válido!\",")) {
-                if ((await mongo.CollectAExpecificData("GameLobby", { GameLobbyid: body.GameLobbyid, ListUserIdLobby: { $all: [player[0].userid] } })).length != 0) {
+                if ((await mongo.CollectAExpecificData("GameLobby", { GameLobbyid: body.GameLobbyid , ListUserIdLobby: { $all: [player[0].userid] }})).length != 0) {
 
                     //var result = await mongo.DeleteData("GameLobby", { GameLobbyid: body.GameLobbyid, ListUserIdLobby: { $all: [player[0].userid] } });
                     // Quando o hoster sai do lobby, o Lobby não é apagado, passa a lobby inativo

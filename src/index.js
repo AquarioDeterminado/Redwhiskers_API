@@ -150,6 +150,19 @@ app.put(`/leaveLobby`, async (req, res) => {
     }
 });
 
+app.put(`/deleteLobby`, async (req, res) => {
+    var result = await FS.DeleteLobby(req.body);
+
+    if (result.Mensagem.includes(" com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+});
+
 //Finish!
 app.get('/listLobby', async (req, res) => {
     var result = await FS.ListLobby(req.body);
@@ -173,19 +186,6 @@ app.get('/listLobby', async (req, res) => {
 app.delete(`/deleteTest`, async (req, res) => {
     await FS.DeleteTable(req.body);
     res.send('Deleted');
-});
-
-app.put(`/deleteLobby`, async (req, res) => {
-    var result = await FS.DeleteLobby(req.body);
-
-    if (result.Mensagem.includes(" com sucesso!")) {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-    }
-    else {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-    }
 });
 
 app.get(`/collectLastId`, async (req, res) => {
