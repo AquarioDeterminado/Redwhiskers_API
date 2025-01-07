@@ -36,34 +36,58 @@ app.post('/login', async (req, res) => {
 
 //Finish!
 app.post('/register', async (req, res) => {
-    var token = await FS.RegistarUser(req.body);
+    if (await FS.CheckNameAreValid(req.body.username)) {
+        var token = await FS.RegistarUser(req.body);
 
-    if (token != "O nome de Utilizador já existe!\n O username ou email já existe!") {
-        if (token) {
-            res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token });
-            res.end("Utilizador registado com sucesso!");
-            // res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
+        if (token != "O nome de Utilizador já existe!\n O username ou email já existe!") {
+            if (token) {
+                res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token });
+                res.end("Utilizador registado com sucesso!");
+                // res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
+            }
+            else {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end("Failed to register!");
+                // res.send('Failed to register');
+            }
         }
-        else {
-            res.writeHead(401, { 'Content-Type': 'application/json' });
-            res.end("Failed to register!");
-            // res.send('Failed to register');
-        }
+        else
+            res.send(token);
     }
-    else
-        res.send(token);
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end("Failed to register!");
+
+    }
 });
 
 app.post('/registerbot', async (req, res) => {
     var result = await FS.RegistarBot(req.body);
 
-    if (!result.includes("Erro ao registar o bot!")) {
+    if (result.Mensagem != "Erro ao registar o bot!") {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(result);
+        res.end(JSON.stringify(result));
     }
     else {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(result);
+    }
+});
+
+app.get('/listBots', async (req, res) => {
+    var result = await FS.VerBots(req.body);
+
+    if (result.length > 0) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else if (result.length == 0) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+    }
+    else {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
     }
 });
 
@@ -209,7 +233,7 @@ app.get(`/collectLastId`, async (req, res) => {
 });
 
 app.get('/test', async (req, res) => {
-    res.send('Test '+new Date().toLocaleString());
+    res.send('Test ' + new Date().toLocaleString());
 });
 
 //TODO: https://stackoverflow.com/questions/11744975/enabling-https-on-express-js

@@ -44,9 +44,9 @@ async function Run() {
     //https://mongoosejs.com/docs/connections.html#multiple_connections
     var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:27017/whiskers',
 
-    //mongoose.connect('mongodb://user:pw@host1.com:27017,host2.com:27017,host3.com:27017/testdb');
+        //mongoose.connect('mongodb://user:pw@host1.com:27017,host2.com:27017,host3.com:27017/testdb');
 
-    //var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017,127.0.0.1:21018/whiskers?replicaSet=rs0',
+        //var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017,127.0.0.1:21018/whiskers?replicaSet=rs0',
 
         {
             authSource: "admin",
@@ -154,11 +154,11 @@ async function CollectId(modelName) {
         return s[s.length - 1].userid + 1;
     else if (modelName == "GameLobby")
         return s[s.length - 1].GameLobbyid + 1;
-    else if(modelName == "Pass")
+    else if (modelName == "Pass")
         return s[s.length - 1].passid + 1;
-    else if(modelName == "Bot")
+    else if (modelName == "Bot")
         return s[s.length - 1].Botid + 1;
-    }
+}
 
 async function DeleteTable(modelName) {
     var s = await switchModel(modelName);
@@ -172,7 +172,7 @@ async function DeleteTable(modelName) {
 async function Createtoken() {
     var token = crypto.randomBytes(40).toString('hex');
 
-    if (await CollectAExpecificData("Pass", { tokens: token }).length > 0)
+    if (await CollectAExpecificData("Pass", { tokens: token }).length > 0 && await CollectAExpecificData("Bot", { token: token }).length > 0)
         Createtoken();
     else
         return token;

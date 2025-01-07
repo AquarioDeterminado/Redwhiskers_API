@@ -59,22 +59,38 @@ async function RegistarUser(body) {
     }
 }
 
-async function RegistarBot(body){
-    try{
+async function RegistarBot(body) {
+    try {
         let idbot = await mongo.CollectId("Bot");
         let token = await mongo.Createtoken();
 
         let result = await mongo.InsertData("Bot", { Botid: idbot, Botname: body.Botname, type: body.type, token: token, DateTime: new Date() });
-        if(result == "Greenlight")
-            return { botid: idbot, botname: body.Botname, token: token};
+        if (result == "Greenlight") {
+            console.log("Bot registado com sucesso!");
+            return { botid: idbot, botname: body.Botname, token: token };
+        }
         else
-            return {"Mensagem":"Erro ao registar o bot!"};
+            return { "Mensagem": "Erro ao registar o bot!" };
     }
-    catch{
-
+    catch (ex){
+        console.log(ex );
     }
 }
 
+async function VerBots() {
+    try {
+        var bots = await mongo.CollectData("Bot");
+        var json = [];
+        bots.forEach(element => {
+            json.push({ botid: element.Botid, botname: element.Botname, type: element.type, token: element.token, DateTime: element.DateTime });
+
+        });
+
+        return json;
+    } catch {
+
+    }
+}
 //TODO: Verificar se os campos estão corretos
 async function UpdateUser(body) {
     let json = "{";
@@ -219,9 +235,9 @@ async function RegistarLobby(body) {
                         return { "Mensagem": "Erro ao criar o lobby!!" };
 
                     if (body.typeLobby == "Singleplayer")
-                        return { "Mensagem": "Lobby criado com sucesso!", "GameLobbyid": id, "LobbyCreated":`${json.LobbyCreated}` };
+                        return { "Mensagem": "Lobby criado com sucesso!", "GameLobbyid": id, "LobbyCreated": `${json.LobbyCreated}` };
                     else
-                        return { "Mensagem": "Lobby criado com sucesso!", "CodeId": codeLobby, "GameLobbyid": id, "LobbyCreated":`${json.LobbyCreated}` };
+                        return { "Mensagem": "Lobby criado com sucesso!", "CodeId": codeLobby, "GameLobbyid": id, "LobbyCreated": `${json.LobbyCreated}` };
                 }
                 else
                     return { "Mensagem": "O utilizador já está num lobby! Por favor, saia do lobby antes de criar um novo!" };
@@ -341,7 +357,7 @@ async function DeleteLobby(body) {
         if (player.length != 0) {
 
             if ((await ValidToken(body.token, body.idHoster)).includes("{\"Mensagem\":\"Token válido!\",")) {
-                if ((await mongo.CollectAExpecificData("GameLobby", { GameLobbyid: body.GameLobbyid , ListUserIdLobby: { $all: [player[0].userid] }})).length != 0) {
+                if ((await mongo.CollectAExpecificData("GameLobby", { GameLobbyid: body.GameLobbyid, ListUserIdLobby: { $all: [player[0].userid] } })).length != 0) {
 
                     //var result = await mongo.DeleteData("GameLobby", { GameLobbyid: body.GameLobbyid, ListUserIdLobby: { $all: [player[0].userid] } });
                     // Quando o hoster sai do lobby, o Lobby não é apagado, passa a lobby inativo
@@ -372,6 +388,13 @@ async function DeleteLobby(body) {
 }
 //TODO: Criar uma função para modificar o idLobby, TypeOfLobby
 
+async function CheckNameAreValid(Username) {
+
+    var check = !(Username.toLowerCase() == "" || Username.toLowerCase() == undefined || Username.toLowerCase() == "null" || Username.toLowerCase() == null || Username.toLowerCase() == "undefined" || Username.toLowerCase() == " " || Username.toLowerCase() == ` ` || Username.toLowerCase().includes("cpu") || Username.toLowerCase().includes("bot") || Username.toLowerCase().includes("ia") || Username.toLowerCase().includes("npc") || Username.toLowerCase().includes("player") || Username.toLowerCase().includes("jogador") || Username.toLowerCase().includes("teste") || Username.toLowerCase().includes("test") || Username.toLowerCase().includes("admin") || Username.toLowerCase().includes("adm") || Username.toLowerCase().includes("root") || Username.toLowerCase().includes("system") || Username.toLowerCase().includes("servidor") || Username.toLowerCase().includes("server") || Username.toLowerCase().includes("host") || Username.toLowerCase().includes("hospedeiro") || Username.toLowerCase().includes("hospedagem") || Username.toLowerCase().includes("hospedar") || Username.toLowerCase().includes("hospedado") || Username.toLowerCase().includes("administrador") || Username.toLowerCase().includes("administradora"));
+
+    return check;
+}
+
 module.exports = {
     login,
     RegistarUser,
@@ -386,6 +409,8 @@ module.exports = {
     JoinLobby,
     LeaveLobby,
     DeleteLobby,
+    VerBots,
+    CheckNameAreValid,
     //TEST Delete after de last test
     DeleteTable,
 }
