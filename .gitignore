@@ -2,4 +2,4 @@
 src/.env
 .vscode/
 node_modules/
-
+.env
