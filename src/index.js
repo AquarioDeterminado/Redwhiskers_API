@@ -3,11 +3,21 @@ require('dotenv').config();
 const exp = require('express');
 const app = exp();
 const FS = require('./FS.js');
+const {startDB} = require("./configs/DB.conf");
 app.use(exp.json());
+
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+};
+
+app.use(allowCrossDomain);
 
 //FIX: não lê o env!
 
-Run().then(() => {
+startDB().then(() => {
     console.log('DB started');
 });
 
