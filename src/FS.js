@@ -9,7 +9,7 @@ async function login(body) {
     else if (body.username != undefined)
         json = { username: body.username.toLowerCase() };
     else
-        return "{\"Mensagem\":\"Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente\"}";
+        return { Mensagem: "Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente" };
 
     var Datauser = await mongo.CollectAExpecificData("User", json);
     if (Datauser.length != 0) {
@@ -20,14 +20,14 @@ async function login(body) {
         var hash = await mongo.ReturnHash(mongo.decrypt(body.password), pass[0].salt);
         // console.log('Password Match:', as[0].pass === hash);
         if (as[0].pass === hash) {
-            return `{\"Mensagem\":\"Login com sucesso!\", \"token\":\" ${as[0].tokens[0].token} \"}`;
+            return { Mensagem: "Login com sucesso!", token: `${as[0].tokens[0].token}` };
 
         }
         else
-            return `{\"Mensagem\":\"Certifique que meteu o ${body.email != undefined ? "email" : "username"} e/ou Password corretamente! Por favor verifique se colocou tudo corretamente!\"}`;
+            return { Mensagem: `Certifique que meteu o ${body.email != undefined ? "email" : "username"} e/ou Password corretamente! Por favor verifique se colocou tudo corretamente!` };
     }
     else
-        return "{\"Mensagem\":\"O utilizador não existe! Por favor, registe o mesmo, antes de tentar fazer login!\"}";
+        return { Mensagem: "O utilizador não existe! Por favor, registe o mesmo, antes de tentar fazer login!" };
 
 
 }
@@ -46,13 +46,13 @@ async function RegistarUser(body) {
                 var result2 = await mongo.InsertData("Pass", { passid: lenghtpass, userid: iduser, pass: await mongo.ReturnHash(await mongo.decrypt(body.password), salt), salt: salt, creationDate: new Date(), used: true, tokens: [{ token: token, created: new Date(), active: true }] });
 
                 if (result1 == "Greenlight" && result2 == "Greenlight")
-                    return token;
+                    return { Mensagem: "Já tem o token do user!", token: token };
                 else
                     return false;
             }
         }
         else
-            return "O nome de Utilizador já existe!\n O username ou email já existe!";
+            return { Mensagem: "O nome de Utilizador já existe!\n O username ou email já existe!" };
     } catch (err) {
         console.log(err);
         return false;
@@ -70,10 +70,10 @@ async function RegistarBot(body) {
             return { botid: idbot, botname: body.Botname, token: token };
         }
         else
-            return { "Mensagem": "Erro ao registar o bot!" };
+            return { Mensagem: "Erro ao registar o bot!" };
     }
-    catch (ex){
-        console.log(ex );
+    catch (ex) {
+        console.log(ex);
     }
 }
 
@@ -130,12 +130,12 @@ async function DeleteUser(body) {
             var result = await mongo.DeleteData("User", { userid: datatoken.UserId });
 
             if (result.deletedCount == 1)
-                return { "Mensagem": "Utilizador eliminado com sucesso!" };
+                return { Mensagem: "Utilizador eliminado com sucesso!" };
             else
-                return { "Mensagem": "Erro ao eliminar o utilizador!" };
+                return { Mensagem: "Erro ao eliminar o utilizador!" };
         }
         else
-            return { "Mensagem": "O token não é válido! Por favor, faça login novamente!" };
+            return { Mensagem: "O token não é válido! Por favor, faça login novamente!" };
 
     }
     catch (err) {
@@ -155,17 +155,17 @@ async function ValidToken(token, userid) {
 
         if (pass.length > 0) {
             if (Math.floor((new Date() - pass[0].tokens[0].created) / (1000 * 60 * 60 * 24)) > 60) {
-                return "{\"Mensagem\":\"Token expirado! Fazer login novamnete\", \"QueFazer\":\"Desconnect_User\"}";
+                return { Mensagem: "Token expirado! Fazer login novamnete", QueFazer: "Desconnect_User" };
             }
             else {
-                return "{\"Mensagem\":\"Token válido!\", \"QueFazer\":\"Continuar\", \"UserId\":" + pass[0].userid + "}";
+                return { Mensagem: "Token válido!", QueFazer: "Continuar", UserId: pass[0].userid };
             }
         }
         else
-            return "{\"Mensagem\":\"Token inválido ou não existente! Por favor, fazer login!\", \"QueFazer\":\"Desconnect_User\"}";
+            return { Mensagem: "Token inválido ou não existente! Por favor, fazer login!", QueFazer: "Desconnect_User" };
     } catch (err) {
         console.log(err);
-        return "{\"Mensagem\":\"Algum erro aconteceu. Reportar aos administradores!\", \"QueFazer\":\"Desconnect_User\"}";
+        return { Mensagem: "Algum erro aconteceu. Reportar aos administradores!", QueFazer: "Desconnect_User" };
     }
 }
 
@@ -207,7 +207,7 @@ async function RegistarLobby(body) {
 
         if (await mongo.CollectAExpecificData("User", { userid: body.idHoster }).length != 0) {
 
-            if ((await ValidToken(body.token, body.idHoster)).includes("{\"Mensagem\":\"Token válido!\",")) {
+            if ((await ValidToken(body.token, body.idHoster)).includes("{Mensagem:\"Token válido!\",")) {
 
                 var id = await mongo.CollectId("GameLobby");
 
@@ -277,7 +277,7 @@ async function ListLobby() {
 async function JoinLobby(body) {
     try {
 
-        if ((await ValidToken(body.token, 0)).includes("{\"Mensagem\":\"Token válido!\",")) {
+        if ((await ValidToken(body.token, 0)).includes("{Mensagem:\"Token válido!\",")) {
             if ((await mongo.CollectAExpecificData("GameLobby", { CodeId: body.LobbyCode, LobbyActive: true, GameWasStarted: false })).length != 0) {
 
                 let player = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: body.token } } });
@@ -312,7 +312,7 @@ async function JoinLobby(body) {
 async function LeaveLobby(body) {
     try {
 
-        if ((await ValidToken(body.token, 0)).includes("{\"Mensagem\":\"Token válido!\",")) {
+        if ((await ValidToken(body.token, 0)).includes("{Mensagem:\"Token válido!\",")) {
             if ((await mongo.CollectAExpecificData("GameLobby", { CodeId: body.LobbyCode, LobbyActive: true, GameWasStarted: false })).length != 0) {
 
                 let player = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: body.token } } });
@@ -356,7 +356,7 @@ async function DeleteLobby(body) {
         var player = await mongo.CollectAExpecificData("User", { userid: body.idHoster });
         if (player.length != 0) {
 
-            if ((await ValidToken(body.token, body.idHoster)).includes("{\"Mensagem\":\"Token válido!\",")) {
+            if ((await ValidToken(body.token, body.idHoster)).includes("{Mensagem:\"Token válido!\",")) {
                 if ((await mongo.CollectAExpecificData("GameLobby", { GameLobbyid: body.GameLobbyid, ListUserIdLobby: { $all: [player[0].userid] } })).length != 0) {
 
                     //var result = await mongo.DeleteData("GameLobby", { GameLobbyid: body.GameLobbyid, ListUserIdLobby: { $all: [player[0].userid] } });

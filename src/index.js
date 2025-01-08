@@ -39,9 +39,9 @@ app.post('/register', async (req, res) => {
     if (await FS.CheckNameAreValid(req.body.username)) {
         var token = await FS.RegistarUser(req.body);
 
-        if (token != "O nome de Utilizador já existe!\n O username ou email já existe!") {
+        if (token.Mensagem != "O nome de Utilizador já existe!\n O username ou email já existe!") {
             if (token) {
-                res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token });
+                res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token.token });
                 res.end("Utilizador registado com sucesso!");
                 // res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
             }
@@ -94,7 +94,7 @@ app.get('/listBots', async (req, res) => {
 app.delete('/deleteUser', async (req, res) => {
     var result = await FS.DeleteUser(req.body);
 
-    if (result.includes("Utilizador eliminado com sucesso!")) {
+    if (result.Message.includes("Utilizador eliminado com sucesso!")) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(result);
     }
@@ -108,18 +108,18 @@ app.delete('/deleteUser', async (req, res) => {
 app.post('/check-token', async (req, res) => {
     var result = await FS.ValidToken(req.headers.token, 0);
 
-    if (result.includes("Token válido")) {
+    if (result.Mensagem.includes("Token válido")) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(result);
+        res.end(result.Mensagem);
         // res.send('{\"essage\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
     }
-    else if (result.includes("Algum erro aconteceu. Reportar aos administradores")) {
+    else if (result.Mensagem.includes("Algum erro aconteceu. Reportar aos administradores")) {
         res.writeHead(409, { 'Content-Type': 'application/json' });
-        res.end(result);
+        res.end(result.Mensagem);
     }
     else {
         res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(result);
+        res.end(result.Mensagem);
         // res.send('Failed to register');
     }
 
