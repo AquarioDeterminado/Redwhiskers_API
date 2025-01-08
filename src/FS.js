@@ -34,7 +34,7 @@ async function login(body) {
 
 async function RegistarUser(body) {
     try {
-        if ((await mongo.CollectAExpecificData("User", { email: body.email.toLowerCase() })).length == 0 && (await mongo.CollectAExpecificData("User", { username: body.username.toLowerCase() })).length == 0) {
+        if ((await mongo.CollectAExpecificData("User", { email: body.email.toLowerCase() })).length === 0 && (await mongo.CollectAExpecificData("User", { username: body.username.toLowerCase() })).length === 0) {
             const salt = await mongo.salt(); // Generate a random salt
             const iduser = await mongo.CollectId("User");
             // body.password = await mongo.encrypt(body.password); //TODO: Tirar brevemente
