@@ -9,10 +9,10 @@ async function login(body) {
     else if (body.username != undefined)
         json = { username: body.username.toLowerCase() };
     else
-        return "{\"Mensagem\":\"Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente\"}";
+        return "{\"Mensagem\":\"Please verify that you have filled all fields.\"}";
 
     var Datauser = await mongo.CollectAExpecificData("User", json);
-    if (Datauser.length != 0) {
+    if (Datauser.length !== 0) {
 
         var pass = (await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid }));
 
@@ -24,10 +24,10 @@ async function login(body) {
 
         }
         else
-            return `{\"Mensagem\":\"Certifique que meteu o ${body.email != undefined ? "email" : "username"} e/ou Password corretamente! Por favor verifique se colocou tudo corretamente!\"}`;
+            return `{\"Mensagem\":\"Wrong ${body.email != undefined ? "email" : "username"} or Password!\"}`;
     }
     else
-        return "{\"Mensagem\":\"O utilizador não existe! Por favor, registe o mesmo, antes de tentar fazer login!\"}";
+        return "{\"Mensagem\":\"User doesn't exist! Please register first.\"}";
 
 
 }

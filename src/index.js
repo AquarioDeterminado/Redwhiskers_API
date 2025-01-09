@@ -26,20 +26,17 @@ app.listen(process.env.PORT, async () => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.status(200).json({message: 'Hello World'});
 });
 
 //Finish!
 app.post('/login', async (req, res) => {
     var result = await FS.login(req.body);
     if (result.includes("Login com sucesso!")) {
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': JSON.parse(result).token });
-        res.end(JSON.parse(result).Mensagem.toString());
-
+        res.status(200).json(JSON.parse(result));
     }
     else {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.parse(result).Mensagem);
+        res.status(401).json(JSON.parse(result));
     }
 });
 
@@ -49,25 +46,19 @@ app.post('/register', async (req, res) => {
     if (await FS.CheckNameAreValid(req.body.username)) {
         var token = await FS.RegistarUser(req.body);
 
-        if (token != "O nome de Utilizador já existe!\n O username ou email já existe!") {
+        if (token !== "User already exists!\n Username or email already in use!") {
             if (token) {
-                res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token });
-                res.end("Utilizador registado com sucesso!");
-                // res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
+                res.status(200).json({message: "User signed up!"});
             }
             else {
-                res.writeHead(401, { 'Content-Type': 'application/json' });
-                res.end("Failed to register!");
-                // res.send('Failed to register');
+                res.status(401).json({message: "Failed to register!"});
             }
         }
         else
-            res.send(token);
+            res.status(401).json({message: token});
     }
     else {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end("Failed to register!");
-
+        res.status(401).json({message: "Failed to register!"});
     }
 });
 
