@@ -147,7 +147,7 @@ async function DeleteUser(body) {
 async function ValidToken(token, userid) {
     try {
         let pass;
-        if (userid != 0) {
+        if (userid !== 0) {
             pass = await mongo.CollectAExpecificData("Pass", { tokens: { $elemMatch: { active: true, token: token } }, userid: userid });
         }
         else
@@ -157,7 +157,7 @@ async function ValidToken(token, userid) {
             if (Math.floor((new Date() - pass[0].tokens[0].created) / (1000 * 60 * 60 * 24)) > 60) {
                 return { Mensagem: "Token expirado! Fazer login novamnete", QueFazer: "Desconnect_User" };
             }
-            else {
+            else {1
                 return { Mensagem: "Token válido!", QueFazer: "Continuar", UserId: pass[0].userid };
             }
         }
@@ -192,8 +192,8 @@ async function CollectLastId() {
 //TODO: Apagar depois dos testes!
 async function DeleteTable(body) {
     try {
-        await mongo.DeleteTable("User");
-        await mongo.DeleteTable("Pass");
+        //await mongo.DeleteTable("User");
+        //await mongo.DeleteTable("Pass");
         await mongo.DeleteTable("GameLobby");
         console.log('Deleted');
     } catch (err) {
@@ -207,13 +207,14 @@ async function RegistarLobby(body) {
 
         if (await mongo.CollectAExpecificData("User", { userid: body.idHoster }).length != 0) {
 
-            if ((await ValidToken(body.token, body.idHoster)).includes("{Mensagem:\"Token válido!\",")) {
+            let token = await ValidToken(body.token, body.idHoster);
+            if (token.QueFazer === "Continuar") {
 
                 var id = await mongo.CollectId("GameLobby");
 
                 var codeLobby = "", json = "";
 
-                if (body.typeLobby != "Singleplayer") {
+                if (body.typeLobby !== "Singleplayer") {
 
                     while (true) {
                         codeLobby = await mongo.CodeIdLobby();
@@ -234,7 +235,7 @@ async function RegistarLobby(body) {
                     if (result == "Redlight")
                         return { "Mensagem": "Erro ao criar o lobby!!" };
 
-                    if (body.typeLobby == "Singleplayer")
+                    if (body.typeLobby === "Singleplayer")
                         return { "Mensagem": "Lobby criado com sucesso!", "GameLobbyid": id, "LobbyCreated": `${json.LobbyCreated}` };
                     else
                         return { "Mensagem": "Lobby criado com sucesso!", "CodeId": codeLobby, "GameLobbyid": id, "LobbyCreated": `${json.LobbyCreated}` };
