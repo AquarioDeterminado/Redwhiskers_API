@@ -18,10 +18,15 @@ async function ReturnHash(password, salt) {
 }
 
 function encrypt(text) {
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from("93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1", 'hex'), Buffer.from("9a5d4c3f7e8a9c2b3e4f1d6a8b7c9e0f", 'hex'));
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return encrypted;
+    const cryptkey = CryptoJS.enc.Utf8.parse('93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+
+    // Encrypt the plaintext using AES
+    let encrypted = CryptoJS.AES.encrypt(text, '93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+
+    // Convert the encrypted data to a Base64 string
+    let encryptedData = encrypted.toString();
+
+    return encryptedData;
 }
 
 // Função para desencriptar
@@ -43,6 +48,7 @@ function decrypt(encryptedData) {
 async function Run() {
     //https://mongoosejs.com/docs/connections.html#replicaset_connections
     //https://mongoosejs.com/docs/connections.html#multiple_connections
+    //    var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:27017,127.0.0.1:27018/db',
     var s = await mongoose.connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/?directConnection=true`,
     ).then(
         () => {

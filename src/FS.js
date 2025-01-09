@@ -192,8 +192,8 @@ async function CollectLastId() {
 //TODO: Apagar depois dos testes!
 async function DeleteTable(body) {
     try {
-        // await mongo.DeleteTable("User");
-        // await mongo.DeleteTable("Pass");
+        await mongo.DeleteTable("User");
+        await mongo.DeleteTable("Pass");
         await mongo.DeleteTable("GameLobby");
         console.log('Deleted');
     } catch (err) {

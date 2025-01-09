@@ -17,7 +17,7 @@ app.use(allowCrossDomain);
 
 //FIX: não lê o env!
 
-startDB().then(() => {
+Run().then(() => {
     console.log('DB started');
 });
 
@@ -32,8 +32,9 @@ app.get('/', (req, res) => {
 //Finish!
 app.post('/login', async (req, res) => {
     var result = await FS.login(req.body);
-    if (result.includes("Login com sucesso!")) {
-        res.status(200).json(JSON.parse(result));
+    if (result.Mensagem.includes("Login com sucesso!")) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': JSON.parse(result).token });
+        res.end(JSON.parse(result).Mensagem.toString());
     }
     else {
         res.status(401).json(JSON.parse(result));
