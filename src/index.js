@@ -26,20 +26,17 @@ app.listen(process.env.PORT, async () => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.status(200).json({message: 'Hello World'});
 });
 
 //Finish!
 app.post('/login', async (req, res) => {
     var result = await FS.login(req.body);
     if (result.includes("Login com sucesso!")) {
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': JSON.parse(result).token });
-        res.end(JSON.parse(result).Mensagem.toString());
-
+        res.status(200).json(JSON.parse(result));
     }
     else {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end(JSON.parse(result).Mensagem);
+        res.status(401).json(JSON.parse(result));
     }
 });
 
@@ -56,18 +53,14 @@ app.post('/register', async (req, res) => {
                 // res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
             }
             else {
-                res.writeHead(401, { 'Content-Type': 'application/json' });
-                res.end("Failed to register!");
-                // res.send('Failed to register');
+                res.status(401).json({message: "Failed to register!"});
             }
         }
         else
-            res.send(token);
+            res.status(401).json({message: token});
     }
     else {
-        res.writeHead(401, { 'Content-Type': 'application/json' });
-        res.end("Failed to register!");
-
+        res.status(401).json({message: "Failed to register!"});
     }
 });
 

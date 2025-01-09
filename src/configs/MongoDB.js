@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const CryptoJS = require("crypto-js");
 const crypto = require('crypto');
 
 //#region  Crypto
@@ -25,14 +26,14 @@ function encrypt(text) {
 
 // Função para desencriptar
 function decrypt(encryptedData) {
-    const decipher = crypto.createDecipheriv(
-        'aes-256-cbc',
-        Buffer.from("93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1", 'hex'),
-        Buffer.from("9a5d4c3f7e8a9c2b3e4f1d6a8b7c9e0f", 'hex')
-    );
-    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    const cryptkey = CryptoJS.enc.Utf8.parse('93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+    const crypted = CryptoJS.enc.Base64.parse(encryptedData);
+
+    let decrypt = CryptoJS.AES.decrypt(encryptedData, '93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+
+    let originalText = decrypt.toString(CryptoJS.enc.Utf8);
+
+    return originalText;
 }
 
 //#endregion

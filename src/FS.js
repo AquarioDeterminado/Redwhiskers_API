@@ -12,7 +12,7 @@ async function login(body) {
         return { Mensagem: "Tem campos em falta! Por favor, verifique se preencheu todos os campos corretamente" };
 
     var Datauser = await mongo.CollectAExpecificData("User", json);
-    if (Datauser.length != 0) {
+    if (Datauser.length !== 0) {
 
         var pass = (await mongo.CollectAExpecificData("Pass", { userid: Datauser[0].userid }));
 
