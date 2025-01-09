@@ -33,8 +33,8 @@ app.get('/', (req, res) => {
 app.post('/login', async (req, res) => {
     var result = await FS.login(req.body);
     if (result.Mensagem.includes("Login com sucesso!")) {
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': JSON.parse(result).token });
-        res.end(JSON.parse(result).Mensagem.toString());
+        res.set('Authorization', result.token)
+        res.status(200).json({message: result.Mensagem});
     }
     else {
         res.status(401).json(JSON.parse(result));
@@ -49,8 +49,8 @@ app.post('/register', async (req, res) => {
 
         if (token.Mensagem != "O nome de Utilizador já existe!\n O username ou email já existe!") {
             if (token) {
-                res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': token.token });
-                res.end("Utilizador registado com sucesso!");
+                res.set('Authorization', token.token)
+                res.status(200).json({message: "Utilizador registado com sucesso!"});
                 // res.send(JSON.parse('{\"message\":\"Utilizador registado com sucesso\", \"token\":\"' + token + '\"}'));
             }
             else {
