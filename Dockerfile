@@ -5,14 +5,12 @@ FROM node:${NODE_VERSION}-alpine
 # Use production node environment by default.
 ENV NODE_ENV production
 
-
 WORKDIR /usr/src/app
 
-COPY package.json package.json
-COPY package-lock.json package-lock.json
+COPY src/package.json package.json
 
 # Install npm dependencies without using the dev packages
-RUN npm ci --omit=dev
+RUN npm i --omit=dev
 
 # Run the application as a non-root user.
 USER root
@@ -21,7 +19,7 @@ USER root
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 3020
+EXPOSE 3000
 
 # Run the application.
 CMD npm start

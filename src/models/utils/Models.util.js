@@ -1,10 +1,11 @@
-User = require('../User.model.js');
-Pass = require('../Pass.model.js');
-PowerUp = require('../PowerUp.model.js');
-Cosmetic = require('../Cosmetic.model.js');
-EmailChangeRequest = require('../EmailChangeRequest.model.js');
-PassChangeRequest = require('../PassChangeRequest.model.js');
-Lobby = require('../Lobby.model')
+User = require('../../models/User.model.js');
+Pass = require('../../models/Pass.model.js');
+PowerUp = require('../../models/PowerUp.model.js');
+Cosmetic = require('../../models/Cosmetic.model.js');
+EmailChangeRequest = require('../../models/EmailChangeRequest.model.js');
+PassChangeRequest = require('../../models/PassChangeRequest.model.js');
+Bot = require('../../models/Bot.model.js');
+GameLobby = require('../../models/GameLobby.model.js');
 
 async function makeModels() {
     return {
@@ -14,7 +15,8 @@ async function makeModels() {
         EmailChangeRequest: EmailChangeRequest.makeModel(),
         PassChangeRequest: PassChangeRequest.makeModel(),
         User: User.makeModel(),
-        Lobby: Lobby.makeModel(),
+        Bot: Bot.makeModel(),
+        GameLobby: GameLobby.makeModel(),
     };
 }
 

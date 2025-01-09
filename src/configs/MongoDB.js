@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const CryptoJS = require("crypto-js");
 const crypto = require('crypto');
 
 //#region  Crypto
@@ -17,22 +18,27 @@ async function ReturnHash(password, salt) {
 }
 
 function encrypt(text) {
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from("93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1", 'hex'), Buffer.from("9a5d4c3f7e8a9c2b3e4f1d6a8b7c9e0f", 'hex'));
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return encrypted;
+    const cryptkey = CryptoJS.enc.Utf8.parse('93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+
+    // Encrypt the plaintext using AES
+    let encrypted = CryptoJS.AES.encrypt(text, '93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+
+    // Convert the encrypted data to a Base64 string
+    let encryptedData = encrypted.toString();
+
+    return encryptedData;
 }
 
 // Função para desencriptar
 function decrypt(encryptedData) {
-    const decipher = crypto.createDecipheriv(
-        'aes-256-cbc',
-        Buffer.from("93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1", 'hex'),
-        Buffer.from("9a5d4c3f7e8a9c2b3e4f1d6a8b7c9e0f", 'hex')
-    );
-    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+    const cryptkey = CryptoJS.enc.Utf8.parse('93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+    const crypted = CryptoJS.enc.Base64.parse(encryptedData);
+
+    let decrypt = CryptoJS.AES.decrypt(encryptedData, '93f5e5439e2d4a9c70e51c1a4b78c8a3d2e6a3f4b791c8f12b3e74d9a3f9e2b1');
+
+    let originalText = decrypt.toString(CryptoJS.enc.Utf8);
+
+    return originalText;
 }
 
 //#endregion
@@ -40,10 +46,10 @@ function decrypt(encryptedData) {
 //#region Simple Requests MongoDB 
 
 async function Run() {
-    var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:21017/whiskers',
-        {
-            authSource: "admin",
-        }
+    //https://mongoosejs.com/docs/connections.html#replicaset_connections
+    //https://mongoosejs.com/docs/connections.html#multiple_connections
+    //    var s = await mongoose.connect('mongodb://root:gizmov-cavdob-nanQo7@127.0.0.1:27017,127.0.0.1:27018/db',
+    var s = await mongoose.connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/?directConnection=true`,
     ).then(
         () => {
             console.log("Connected to MongoDB");
@@ -52,6 +58,7 @@ async function Run() {
             console.error(err);
         }
     );
+    //,127.0.0.1:21018/whiskers
     console.log("Connected to MongoDB");
 }
 
@@ -78,8 +85,11 @@ async function switchModel(modelName) {
         case "PowerUp":
             return require('../models/PowerUp.model.js').makeModel();
             break;
-        case "GameLobby":
+        case "GameLobby"://GameLobby.models.js
             return require('../models/GameLobby.model.js').makeModel();
+            break;
+        case "Bot":
+            return require('../models/Bot.model.js').makeModel();
             break;
         default:
             break;
@@ -115,8 +125,23 @@ async function InsertData(modelName, datajson) {
 async function DeleteData(modelName, datajson) {
     var s = await switchModel(modelName);
 
-    return (await s.delete(datajson)).exec();
+    var as = await s.find(datajson).exec();
+    as = await s.deleteOne(datajson);
+
+    return as;
 }
+
+async function UpdateData(modelName, datajson, datajson2) {
+    var s = await switchModel(modelName);
+
+    //TODO: VERIFICAR PORQUE É QUE ELE NÃO ESTÁ A ATUALIZAR! 
+    var asasa = await s.find(datajson).exec();
+
+    var as = await s.updateOne(datajson, datajson2);
+
+    return as;
+}
+
 
 async function CollectId(modelName) {
     var s = await switchModel(modelName);
@@ -124,11 +149,17 @@ async function CollectId(modelName) {
 
     if (s.length == 0)
         return 1;
-    else
+    else if (modelName == "User")
         return s[s.length - 1].userid + 1;
+    else if (modelName == "GameLobby")
+        return s[s.length - 1].GameLobbyid + 1;
+    else if (modelName == "Pass")
+        return s[s.length - 1].passid + 1;
+    else if (modelName == "Bot")
+        return s[s.length - 1].Botid + 1;
 }
 
-async function DeleteUser(modelName) {
+async function DeleteTable(modelName) {
     var s = await switchModel(modelName);
     s.deleteMany({}).exec();
 }
@@ -140,7 +171,7 @@ async function DeleteUser(modelName) {
 async function Createtoken() {
     var token = crypto.randomBytes(40).toString('hex');
 
-    if (await CollectAExpecificData("Pass", { tokens: token }).length > 0)
+    if (await CollectAExpecificData("Pass", { tokens: token }).length > 0 && await CollectAExpecificData("Bot", { token: token }).length > 0)
         Createtoken();
     else
         return token;
@@ -148,12 +179,17 @@ async function Createtoken() {
 
 //#endregion
 
+//#region Create CodeIdLobby
+async function CodeIdLobby() {
+    return crypto.randomBytes(12).toString('hex');
+}
 
 module.exports =
 {
     Run,
     CollectData,
     DeleteData,
+    UpdateData,
     CollectAExpecificData,
     InsertData,
     CollectId,
@@ -161,6 +197,7 @@ module.exports =
     encrypt,
     salt,
     decrypt,
-    DeleteUser,
+    DeleteTable,
     Createtoken,
+    CodeIdLobby,
 }
