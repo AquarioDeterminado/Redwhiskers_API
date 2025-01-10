@@ -7,10 +7,10 @@ ENV NODE_ENV production
 
 WORKDIR /usr/src/app
 
-COPY src/package.json package.json
+COPY package.json package.json
 
 # Install npm dependencies without using the dev packages
-RUN npm i --omit=dev
+RUN npm install
 
 # Run the application as a non-root user.
 USER root
