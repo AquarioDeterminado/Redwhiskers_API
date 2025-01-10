@@ -12,6 +12,6 @@
     "WhiskersAPI": "file:"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js"
   }
 }
